@@ -151,10 +151,10 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
 
 
         /* Define and Initialize Motors */
-        leftFrontDrive  = hardwareMap.dcMotor.get("frontLeftMotor");
-        leftBackDrive   = hardwareMap.dcMotor.get("backLeftMotor");
-        rightFrontDrive = hardwareMap.dcMotor.get("frontRightMotor");
-        rightBackDrive  = hardwareMap.dcMotor.get("backRightMotor");
+        leftFrontDrive  = hardwareMap.dcMotor.get("left_front_drive");
+        leftBackDrive   = hardwareMap.dcMotor.get("left_rear_drive");
+        rightFrontDrive = hardwareMap.dcMotor.get("right_front_drive");
+        rightBackDrive  = hardwareMap.dcMotor.get("right_rear_drive");
         armMotor        = hardwareMap.get(DcMotor.class, "arm"); //the arm motor
         slideMotor = hardwareMap.dcMotor.get("slide");
 
@@ -270,13 +270,17 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
                 intake.setPower(INTAKE_COLLECT);
             }
             else if (gamepad1.right_bumper) {
-                intake.setPower(INTAKE_OFF);
-            }
-            else if (gamepad1.y) {
                 intake.setPower(INTAKE_DEPOSIT);
             }
-
-
+            else if (gamepad2.left_bumper) {
+                intake.setPower(INTAKE_COLLECT);
+            }
+            else if (gamepad2.right_bumper) {
+                intake.setPower(INTAKE_DEPOSIT);
+            }
+            else {
+                intake.setPower(INTAKE_OFF);
+            }
             /* Here we create a "fudge factor" for the arm position.
             This allows you to adjust (or "fudge") the arm position slightly with the gamepad triggers.
             We want the left trigger to move the arm up, and right trigger to move the arm down.
@@ -285,8 +289,8 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
             than the other, it "wins out". This variable is then multiplied by our FUDGE_FACTOR.
             The FUDGE_FACTOR is the number of degrees that we can adjust the arm by with this function. */
 
-            armPositionFudgeFactor = FUDGE_FACTOR * (gamepad2.right_trigger + (-gamepad2.left_trigger));
-
+            //armPositionFudgeFactor = FUDGE_FACTOR * (-gamepad2.left_stick_y);
+            armPosition -= gamepad2.left_stick_y/4;
 
             /* Here we implement a set of if else statements to set our arm to different scoring positions.
             We check to see if a specific button is pressed, and then move the arm (and sometimes
@@ -314,23 +318,23 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
             else if (gamepad1.x){
                 /* This is the correct height to score the sample in the HIGH BASKET */
                 armPosition = ARM_SCORE_SAMPLE_IN_LOW;
-                //SlidePosition = SLIDE_SCORING_IN_HIGH_BASKET;
+                SlidePosition = SLIDE_SCORING_IN_HIGH_BASKET;
             }
 
             else if (gamepad1.dpad_left) {
                     /* This turns off the intake, folds in the wrist, and moves the arm
                     back to folded inside the robot. This is also the starting configuration */
                 armPosition = ARM_COLLAPSED_INTO_ROBOT;
-                //SlidePosition = SLIDE_COLLAPSED;
+                SlidePosition = SLIDE_COLLAPSED;
                 intake.setPower(INTAKE_OFF);
                 wrist.setPosition(WRIST_FOLDED_IN);
             }
 
-            else if (gamepad1.dpad_right){
-                /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
-                armPosition = ARM_SCORE_SPECIMEN;
-                wrist.setPosition(WRIST_FOLDED_IN);
-            }
+//            else if (gamepad1.dpad_right){
+//                /* This is the correct height to score SPECIMEN on the HIGH CHAMBER */
+//                armPosition = ARM_SCORE_SPECIMEN;
+//                wrist.setPosition(WRIST_FOLDED_IN);
+//            }
 
             else if (gamepad1.dpad_up){
                 /* This sets the arm to vertical to hook onto the LOW RUNG for hanging */
@@ -373,7 +377,7 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
             our armSlideComp, which adjusts the arm height for different lift extensions.
             We also set the target velocity (speed) the motor runs at, and use setMode to run it.*/
 
-            armMotor.setTargetPosition((int) (armPosition + armPositionFudgeFactor + armSlideComp));
+            armMotor.setTargetPosition((int) (armPosition + armSlideComp));
 
             ((DcMotorEx) armMotor).setVelocity(2100);
             armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
@@ -398,12 +402,8 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
             we are only incrementing it a small amount each cycle.
              */
 
-            if (gamepad2.right_bumper){
-                SlidePosition += 2800 * cycletime;
-            }
-            else if (gamepad2.left_bumper){
-                SlidePosition -= 2800 * cycletime;
-            }
+            SlidePosition += gamepad2.right_stick_x;
+
             /*here we check to see if the lift is trying to go higher than the maximum extension.
              *if it is, we set the variable to the max.
              */
@@ -430,7 +430,6 @@ public class StartingCodeWithSquaredInput extends LinearOpMode {
              * it didn't end up working... But here's the code we run it with. It just sets the motor
              * power to match the inverse of the left stick y.
              */
-            slideMotor.setPower(-gamepad2.left_stick_y);
 
             /* This is how we check our loop time. We create three variables:
             looptime is the current time when we hit this part of the code
