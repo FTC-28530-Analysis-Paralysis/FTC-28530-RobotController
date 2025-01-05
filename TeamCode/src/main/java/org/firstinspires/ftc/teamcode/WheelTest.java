@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
-//Comment out the @Disabled line (add a couple of slashes // before it) when you are ready for this program to be visible on the driver hub
+//TODO: Comment out the @Disabled line (add a couple of slashes // before it) when you are ready for this program to be visible on the driver hub
 @Disabled
 @TeleOp(name="Wheel Test Code")
 public class WheelTest extends LinearOpMode {
@@ -29,11 +29,12 @@ public class WheelTest extends LinearOpMode {
         // Everything above this happens when the initialize button is pressed. Everything below happens when the start button is pressed.
         waitForStart();
 
-        /* Any while or other loops need to check to make sure the opMode is active. That is, it
-         * should exit the loop and exit the program if the stop button has been pressed on the driver hub.
-         * This while loop is where any repeated actions should be placed. If you have fairly simple
-         * code without any sleep commands in it (bad practice), it will cycle through the loop roughly
-         * 20 times per second depending on processor load
+        /*
+         * Any while or other loops need to check to make sure the opMode is active. That is, it should exit the loop and exit the program
+         * if the stop button has been pressed on the driver hub. This while loop is where any repeated actions should be placed.
+         * If you have fairly simple code without any sleep commands in it (sleep commands are bad practice as they are blocking
+         * - they prevent other things from happening during that time), it will cycle through the loop roughly 20 times per second depending
+         * on processor load
          */
         while (opModeIsActive()) {
 
